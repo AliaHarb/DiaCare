@@ -1,4 +1,5 @@
 
+using DiaCare.Infrastructure.Extensions;
 namespace DiaCare.WebAPI
 {
     public class Program
@@ -13,6 +14,7 @@ namespace DiaCare.WebAPI
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            builder.Services.AddInfrastructure(builder.Configuration);
 
             var app = builder.Build();
 
