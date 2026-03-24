@@ -26,58 +26,52 @@ namespace DiaCare.Infrastructure.Data
         {
             base.OnModelCreating(builder);
 
+            
             builder.Entity<HealthProfile>()
-                .HasOne<ApplicationUser>()
-                .WithMany()
+                .HasOne(p => p.User)
+                .WithMany(u => u.HealthProfiles)
                 .HasForeignKey(p => p.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+       
             builder.Entity<PredictionResult>()
-                .HasOne<ApplicationUser>()
-                .WithMany()
-                .HasForeignKey(p => p.UserId)
+                .HasOne(r => r.User)
+                .WithMany(u => u.PredictionResults)
+                .HasForeignKey(r => r.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             builder.Entity<PredictionResult>()
-        .HasOne<HealthProfile>()
-        .WithOne()
-        .HasForeignKey<PredictionResult>(r => r.HealthProfileId)
-        .OnDelete(DeleteBehavior.NoAction);
+                .HasOne(r => r.HealthProfile)
+                .WithMany(p => p.PredictionResults) 
+                .HasForeignKey(r => r.HealthProfileId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            
+            builder.Entity<ChatMessage>()
+                .HasOne(m => m.User)
+                .WithMany(u => u.ChatMessages)
+                .HasForeignKey(m => m.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
 
             builder.Entity<Notification>()
-        .HasOne<ApplicationUser>()
-        .WithMany()
-        .HasForeignKey(n => n.UserId)
-        .OnDelete(DeleteBehavior.Cascade);
+    .HasOne(n => n.User)
+    .WithMany(u => u.Notifications)
+    .HasForeignKey(n => n.UserId)
+    .OnDelete(DeleteBehavior.Cascade);
 
-            builder.Entity<ChatMessage>()
-        .HasOne<ApplicationUser>()
-        .WithMany()
-        .HasForeignKey(m => m.UserId)
-        .OnDelete(DeleteBehavior.Cascade);
+            // Composite Key 
+            builder.Entity<UserBadge>()
+                .HasKey(ub => new { ub.UserId, ub.BadgeId });
 
             builder.Entity<UserBadge>()
-                    .HasKey(ub => new { ub.UserId, ub.BadgeId }); // Composite Key
+    .HasOne(ub => ub.User)
+    .WithMany(u => u.UserBadges)
+    .HasForeignKey(ub => ub.UserId);
 
             builder.Entity<UserBadge>()
-                .HasOne<ApplicationUser>()
-                .WithMany()
-                .HasForeignKey(ub => ub.UserId);
-
-            builder.Entity<UserBadge>()
-                .HasOne<Badge>()
-                .WithMany()
+                .HasOne(ub => ub.Badge)
+                .WithMany(b => b.UserBadges)
                 .HasForeignKey(ub => ub.BadgeId);
-
-            // (Decimal Precision)
-
-            builder.Entity<HealthProfile>(entity =>
-            {
-                entity.Property(e => e.Bmi).HasColumnType("decimal(5,2)");
-                entity.Property(e => e.InsulinLevel).HasColumnType("decimal(5,2)");
-                entity.Property(e => e.HbA1cLevel).HasColumnType("decimal(5,2)");
-                entity.Property(e => e.SugarIntakeGramsPerDay).HasColumnType("decimal(5,2)");
-            });
         }
     }
 }

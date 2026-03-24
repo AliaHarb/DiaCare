@@ -11,5 +11,9 @@ namespace DiaCare.Domain.Entities
         public string UserId { get; set; }
         public int BadgeId { get; set; }
         public DateTime EarnedAt { get; set; } = DateTime.Now;
+
+        //  Navigation
+        public ApplicationUser User { get; set; }
+        public Badge Badge { get; set; }
     }
 }

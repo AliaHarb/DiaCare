@@ -13,6 +13,9 @@ namespace DiaCare.Domain.Entities
         public string Message { get; set; }
        
         public bool IsRead { get; set; } = false; 
-        public DateTime CreatedAt { get; set; } = DateTime.Now; 
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
+
+        //  Navigation
+        public ApplicationUser User { get; set; }
     }
 }

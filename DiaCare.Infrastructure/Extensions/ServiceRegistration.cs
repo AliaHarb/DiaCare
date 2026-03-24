@@ -23,8 +23,9 @@ namespace DiaCare.Infrastructure.Extensions
                ));
 
 
-            services.AddIdentityCore<ApplicationUser>()
-                    .AddEntityFrameworkStores<AppDbContext>();
+            services.AddIdentity<ApplicationUser, IdentityRole>()
+     .AddEntityFrameworkStores<AppDbContext>()
+     .AddDefaultTokenProviders();
 
             return services;
         }

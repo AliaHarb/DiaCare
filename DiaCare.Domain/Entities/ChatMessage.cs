@@ -15,6 +15,10 @@ namespace DiaCare.Domain.Entities
         public string Content { get; set; }
         
         public DateTime Timestamp { get; set; } = DateTime.Now; 
+
         public int SenderType { get; set; } // 0=User, 1=AI 
+       //  Navigation
+        public ApplicationUser User { get; set; }
+
     }
 }
