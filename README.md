@@ -63,9 +63,6 @@ The project follows **Clean Architecture**:
 ---
 
 
-- Add Health Articles & Tips  
-- Potential mobile app integration  
 
----
 
 
