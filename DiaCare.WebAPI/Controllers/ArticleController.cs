@@ -44,7 +44,7 @@ namespace DiaCare.WebAPI.Controllers
 
       
         [HttpPost]
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([FromBody] ArticleDto dto)
         {
            
@@ -55,7 +55,7 @@ namespace DiaCare.WebAPI.Controllers
 
         
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin")]
+       // [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
             var success = await _articleService.DeleteArticleAsync(id);
