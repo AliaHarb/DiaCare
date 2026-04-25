@@ -1,4 +1,4 @@
-﻿using DiaCare.Domain.DTOS;
+using DiaCare.Domain.DTOS;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +9,7 @@ namespace DiaCare.Application.Interfaces
 {
     public interface IPredictionService
     {
-        Task<PredictionResultDto> PredictAsync(PredictionInputDto inputdto);
+        Task<PredictionResultDto> PredictAsync(PredictionInputDto inputdto, string? userId);
 
     }
 }

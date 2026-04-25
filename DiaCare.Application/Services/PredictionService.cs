@@ -1,9 +1,8 @@
-﻿using DiaCare.Application.Adapters;
+using DiaCare.Application.Adapters;
 using DiaCare.Application.Interfaces;
 using DiaCare.Domain.DTOS;
 using DiaCare.Domain.Entities;
 using DiaCare.Domain.Interfaces;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -20,13 +19,12 @@ namespace DiaCare.Application.Services
         private readonly string? _baseUrl;
         private readonly HttpClient _httpClient;
         private readonly IPredictionAdapter _predictionAdapter;
-        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper; // AutoMapper to handle object-to-object mapping.
 
 
         public PredictionService(HttpClient httpClient, IConfiguration configuration,
-            IPredictionAdapter predictionAdapter,IHttpContextAccessor httpContextAccessor,
+            IPredictionAdapter predictionAdapter,
             IUnitOfWork unitOfWork, IMapper mapper)
             {
                 _baseUrl = configuration["AISettings:BaseUrl"]
@@ -34,11 +32,10 @@ namespace DiaCare.Application.Services
 
                 _httpClient = httpClient;
                 _predictionAdapter = predictionAdapter;
-                _httpContextAccessor = httpContextAccessor;
                 _unitOfWork = unitOfWork;
                 _mapper = mapper; // add mapper to constructor
             }
-        public async Task<PredictionResultDto> PredictAsync(PredictionInputDto inputdto)
+        public async Task<PredictionResultDto> PredictAsync(PredictionInputDto inputdto, string? userId)
         {
             try
             {
@@ -59,9 +56,7 @@ namespace DiaCare.Application.Services
                 // 4. Map response
                 var resultDto = _predictionAdapter.MapFromAiResponse(aiRawResponse);
 
-                // 5. Get UserId
-                var userId = _httpContextAccessor.HttpContext?.User?
-                    .FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                // 5. UserId is passed in as a parameter (injected by the caller — e.g., Controller)
 
                 // 6. Create HealthProfile
 
