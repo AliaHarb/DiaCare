@@ -1,4 +1,4 @@
-﻿using DiaCare.Application.Helpers;
+using DiaCare.Application.Helpers;
 using DiaCare.Application.Interfaces;
 using DiaCare.Application.Services;
 using DiaCare.Domain.DTOS;
@@ -24,7 +24,9 @@ namespace DiaCare.WebAPI.Controllers
             if (dto == null)
                 return BadRequest(Result<string>.Failure("Data is required"));
 
-            var result = await _predictionService.PredictAsync(dto);
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+            var result = await _predictionService.PredictAsync(dto, userId);
 
             if (result == null || result.RiskCategory == "Service unavailable")
                 return StatusCode(500, Result<PredictionResultDto>.Failure("AI Model is down", 500));
