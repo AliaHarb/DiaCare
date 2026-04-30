@@ -14,98 +14,97 @@ using System.Threading.Tasks;
 using AutoMapper;         // for mapping by mapper solve bad smell code reduntant code.
 namespace DiaCare.Application.Services
 {
-    public class PredictionService : IPredictionService
-    {
-        private readonly string? _baseUrl;
-        private readonly HttpClient _httpClient;
-        private readonly IPredictionAdapter _predictionAdapter;
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper; // AutoMapper to handle object-to-object mapping.
-        public PredictionService(HttpClient httpClient, IConfiguration configuration,
-            IPredictionAdapter predictionAdapter,
-            IUnitOfWork unitOfWork, IMapper mapper)
-            {
-                _baseUrl = configuration["AISettings:BaseUrl"]
-                    ?? throw new Exception("AI Base URL is missing");
+        public class PredictionService : BaseService, IPredictionService
+        {
+            private readonly string? _baseUrl;
+            private readonly HttpClient _httpClient;
+            private readonly IPredictionAdapter _predictionAdapter;
 
+          
+            public PredictionService(
+                HttpClient httpClient,
+                IConfiguration configuration,
+                IPredictionAdapter predictionAdapter,
+                IUnitOfWork unitOfWork,
+                IMapper mapper) : base(unitOfWork, mapper) // [PULL UP FIELD Applied]
+            {
+                _baseUrl = configuration["AISettings:BaseUrl"] ?? throw new Exception("AI Base URL is missing");
                 _httpClient = httpClient;
                 _predictionAdapter = predictionAdapter;
-                _unitOfWork = unitOfWork;
-                _mapper = mapper; // add mapper to constructor
             }
 
-        /*  Refactoring 1 :: Long Method Smell  -> Apply Extract Method Refactoring
-         -------------------------------------------------------------------
+            /*  Refactoring 1 :: Long Method Smell  -> Apply Extract Method Refactoring
+             -------------------------------------------------------------------
 
-        //Before Refactoring :: All in one method
+            //Before Refactoring :: All in one method
 
-       public async Task<PredictionResultDto> PredictAsync(PredictionInputDto inputdto, string? userId)
-       {
-           try
+           public async Task<PredictionResultDto> PredictAsync(PredictionInputDto inputdto, string? userId)
            {
-               // 1. Map to AI  **********
-               var ClientAiRequest = _predictionAdapter.MapToAiRequest(inputdto);
-
-               // 2. Call AI    ************
-               var ModelReq = await _httpClient.PostAsJsonAsync(_baseUrl, ClientAiRequest);
-
-               if (!ModelReq.IsSuccessStatusCode)
+               try
                {
-                   return new PredictionResultDto { RiskCategory = "AI Model Error" };
-               }
+                   // 1. Map to AI  **********
+                   var ClientAiRequest = _predictionAdapter.MapToAiRequest(inputdto);
 
-               // 3. Read response  ********
-               var aiRawResponse = await ModelReq.Content.ReadFromJsonAsync<JsonElement>();
+                   // 2. Call AI    ************
+                   var ModelReq = await _httpClient.PostAsJsonAsync(_baseUrl, ClientAiRequest);
 
-               // 4. Map response  ********
-               var resultDto = _predictionAdapter.MapFromAiResponse(aiRawResponse);
+                   if (!ModelReq.IsSuccessStatusCode)
+                   {
+                       return new PredictionResultDto { RiskCategory = "AI Model Error" };
+                   }
 
-               // 5. Create HealthProfile  **********
-               var healthProfile = new HealthProfile
-               {
-                   UserId = userId,
+                   // 3. Read response  ********
+                   var aiRawResponse = await ModelReq.Content.ReadFromJsonAsync<JsonElement>();
 
-                   Bmi = inputdto.Bmi,
-                   BloodPressure = inputdto.BloodPressure,
-                   FastingGlucoseLevel = inputdto.FastingGlucoseLevel,
-                   InsulinLevel = inputdto.InsulinLevel,
-                   HbA1cLevel = inputdto.HbA1cLevel,
-                   CholesterolLevel = inputdto.CholesterolLevel,
-                   TriglyceridesLevel = inputdto.TriglyceridesLevel,
-                   PhysicalActivityLevel = inputdto.PhysicalActivityLevel,
-                   DailyCalorieIntake = inputdto.DailyCalorieIntake,
-                   SugarIntakeGramsPerDay = inputdto.SugarIntakeGramsPerDay,
-                   FamilyHistoryDiabetes = inputdto.FamilyHistoryDiabetes,
-                   WaistCircumferenceCm = inputdto.WaistCircumferenceCm,
+                   // 4. Map response  ********
+                   var resultDto = _predictionAdapter.MapFromAiResponse(aiRawResponse);
 
-                   CreatedAt = DateTime.UtcNow
-               };
+                   // 5. Create HealthProfile  **********
+                   var healthProfile = new HealthProfile
+                   {
+                       UserId = userId,
 
-                // 7. Save HealthProfile ***********
-                await _unitOfWork.HealthProfiles.AddAsync(healthProfile);
+                       Bmi = inputdto.Bmi,
+                       BloodPressure = inputdto.BloodPressure,
+                       FastingGlucoseLevel = inputdto.FastingGlucoseLevel,
+                       InsulinLevel = inputdto.InsulinLevel,
+                       HbA1cLevel = inputdto.HbA1cLevel,
+                       CholesterolLevel = inputdto.CholesterolLevel,
+                       TriglyceridesLevel = inputdto.TriglyceridesLevel,
+                       PhysicalActivityLevel = inputdto.PhysicalActivityLevel,
+                       DailyCalorieIntake = inputdto.DailyCalorieIntake,
+                       SugarIntakeGramsPerDay = inputdto.SugarIntakeGramsPerDay,
+                       FamilyHistoryDiabetes = inputdto.FamilyHistoryDiabetes,
+                       WaistCircumferenceCm = inputdto.WaistCircumferenceCm,
 
-                // 8. Create PredictionResult **********
-                var predictionRecord = new PredictionResult
-                {
-                    UserId = userId,
-                    HealthProfile = healthProfile, //  Navigation property
-                    RiskScore = resultDto.RiskScore,
-                    ResultText = resultDto.RiskCategory,
-                    Recommendation = "Please follow up with a specialist for further advice.",
-                    CreatedAt = DateTime.UtcNow
-                };
-                // 9. Save Prediction  ********
-                await _unitOfWork.PredictionResults.AddAsync(predictionRecord);
-                await _unitOfWork.SaveChangesAsync();
+                       CreatedAt = DateTime.UtcNow
+                   };
 
-                return resultDto;
-            }
-         */
+                    // 7. Save HealthProfile ***********
+                    await _unitOfWork.HealthProfiles.AddAsync(healthProfile);
 
-        //After Refactoring ::
-        //Extracted the database saving logic into a separate method SavePredictionDataAsync
-        //for better readability and maintainability.
-        public async Task<PredictionResultDto> PredictAsync(PredictionInputDto inputdto, string? userId)
+                    // 8. Create PredictionResult **********
+                    var predictionRecord = new PredictionResult
+                    {
+                        UserId = userId,
+                        HealthProfile = healthProfile, //  Navigation property
+                        RiskScore = resultDto.RiskScore,
+                        ResultText = resultDto.RiskCategory,
+                        Recommendation = "Please follow up with a specialist for further advice.",
+                        CreatedAt = DateTime.UtcNow
+                    };
+                    // 9. Save Prediction  ********
+                    await _unitOfWork.PredictionResults.AddAsync(predictionRecord);
+                    await _unitOfWork.SaveChangesAsync();
+
+                    return resultDto;
+                }
+             */
+
+            //After Refactoring ::
+            //Extracted the database saving logic into a separate method SavePredictionDataAsync
+            //for better readability and maintainability.
+            public async Task<PredictionResultDto> PredictAsync(PredictionInputDto inputdto, string? userId)
         {
             try
             {

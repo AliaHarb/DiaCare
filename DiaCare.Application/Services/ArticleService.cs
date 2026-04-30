@@ -12,22 +12,17 @@ using System.Threading.Tasks;
 
 namespace DiaCare.Application.Services
 {
-    public class ArticleService : IArticleService
+    public class ArticleService : BaseService, IArticleService
     {
         private readonly IBaseRepository<Article> _baseRepository;
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
 
-        public ArticleService(IBaseRepository<Article> baseRepository, IUnitOfWork unitOfWork,
-            IMapper mapper)
+        public ArticleService(IBaseRepository<Article> baseRepository, IUnitOfWork unitOfWork, IMapper mapper)
+            : base(unitOfWork, mapper) 
         {
             _baseRepository = baseRepository;
-            _unitOfWork = unitOfWork;
-
-            _mapper = mapper;
-
         }
-        // Refactoring 3: Inline Temp
+
+        // Refactoring 3: Inline Temp & Replace Temp with Query 
         // Code Smell: Unnecessary Temporary Variable
         //--------------------------------------------------------
 
@@ -47,31 +42,23 @@ namespace DiaCare.Application.Services
             return _mapper.Map<IEnumerable<ArticleDto>>(await _baseRepository.GetAllAsync());
         }
 
-        // Refactoring 4: Rename Method
+        // Refactoring 4: Rename Method 
         // Code Smell: Uncommunicative Name (Vague method name)
         //// It's not clear "What" we are getting by ID from the name
         //[BEFORE] :: public async Task<ArticleDto> GetByIdAsync(int id)
 
         // After Refactoring
         // Improvement: Meaningful and self-documenting name
-        public async Task<ArticleDto> GetArticleByIdAsync(int id)
+        public async Task<ArticleDto> GetArticleByIdAsync(int id) // Now the name clearly describes the returned object
         {
-            // Now the name clearly describes the returned object
-            
-                var exist = await _baseRepository.GetByIdAsync(id);
-            return _mapper.Map<ArticleDto>(exist);
+            return _mapper.Map<ArticleDto>(await _baseRepository.GetByIdAsync(id));
         }
 
-        // Refactoring 5: Consolidate Duplicate Fragments
-        // Code Smell: Fragmented Duplication
-        // Improvement: Centralized the save logic to one point
+        
         public async Task<ArticleDto> AddArticleAsync(ArticleDto dto)
         {
             var article = _mapper.Map<Article>(dto);
             await _baseRepository.AddAsync(article);
-            // [BEFORE]
-            // This fragment is repeated in Add, Update, and Delete
-            // await _unitOfWork.SaveChangesAsync();
 
             // After Refactoring::
             //Using a private helper to consolidate the fragment
@@ -81,7 +68,7 @@ namespace DiaCare.Application.Services
 
        
 
-        //Refactoring 6:: Replace Nested Conditional with Guard Clauses
+        //Refactoring 5:: Replace Nested Conditional with Guard Clauses
         // Code Smell: Nested Conditional (Complex structure)
         //--------------------------------------------------------
 
