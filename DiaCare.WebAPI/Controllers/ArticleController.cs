@@ -31,7 +31,7 @@ namespace DiaCare.WebAPI.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
-            var article = await _articleService.GetByIdAsync(id);
+            var article = await _articleService.GetArticleByIdAsync(id);
 
             if (article == null)
             {
