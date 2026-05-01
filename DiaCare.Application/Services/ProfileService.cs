@@ -13,10 +13,9 @@ using Microsoft.Extensions.Options;
 
 namespace DiaCare.Application.Services
 {
-    public class ProfileService:IProfileServices
+    public class ProfileService:BaseService, IProfileServices
     {
         private UserManager<ApplicationUser> _userManager;
-        private IMapper _mapper;
 
         public ProfileService(UserManager<ApplicationUser> userManager, IMapper mapper)
         {

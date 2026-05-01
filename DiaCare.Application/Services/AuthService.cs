@@ -3,6 +3,7 @@ using DiaCare.Application.Helpers;
 using DiaCare.Application.Interfaces;
 using DiaCare.Domain.DTOS;
 using DiaCare.Domain.Entities;
+using DiaCare.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -12,13 +13,12 @@ using System.Text;
 
 namespace DiaCare.Application.Services
 {
-    public class AuthService : IAuthService
+    public class AuthService :BaseService, IAuthService
     {
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IMapper _mapper;
         private readonly JwtSettings _jwt;
 
-        public AuthService(UserManager<ApplicationUser> userManager, IMapper mapper, IOptions<JwtSettings> jwt)
+        public AuthService(UserManager<ApplicationUser> userManager, IUnitOfWork unitOfWork, IMapper mapper, IOptions<JwtSettings> jwt)
         {
             _userManager = userManager;
             _mapper = mapper;

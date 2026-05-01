@@ -26,7 +26,7 @@ namespace DiaCare.Application.Services
                 IConfiguration configuration,
                 IPredictionAdapter predictionAdapter,
                 IUnitOfWork unitOfWork,
-                IMapper mapper) : base(unitOfWork, mapper) // [PULL UP FIELD Applied]
+                IMapper mapper) // [PULL UP FIELD Applied]
             {
                 _baseUrl = configuration["AISettings:BaseUrl"] ?? throw new Exception("AI Base URL is missing");
                 _httpClient = httpClient;
