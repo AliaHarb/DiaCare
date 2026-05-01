@@ -12,31 +12,38 @@ namespace DiaCare.UnitTests
     [TestClass]
     public class ArticleRetrievalTests
     {
+        private Mock<IBaseRepository<Article>> _mockRepo;
+        private Mock<IUnitOfWork> _mockUow;
+        private Mock<IMapper> _mockMapper;
+        private ArticleService _service;
+        [TestInitialize]
+        public void Setup()
+        {
+            // intializing the mocks and the service before each test
+            _mockRepo = new Mock<IBaseRepository<Article>>();
+            _mockUow = new Mock<IUnitOfWork>();
+            _mockMapper = new Mock<IMapper>();
+            _service = new ArticleService(_mockRepo.Object, _mockUow.Object, _mockMapper.Object);
+        }
+
         [TestMethod]
         public async Task GetArticleById_ShouldReturnCorrectData()
         {
             // 1. Arrange: (Setup Mocks)
             int expectedId = 1;
             string expectedTitle = "Diabetes Care 101";
-            // Mocks are like "fake" versions of our dependencies  without needing a real database or actual mapping logic.
-            var mockRepo = new Mock<IBaseRepository<Article>>();
-            var mockUow = new Mock<IUnitOfWork>();
-            var mockMapper = new Mock<IMapper>();
 
             // returning a fake article when the repository's GetByIdAsync method is called with the expected ID
             var fakeArticle = new Article { Id = 1, Title = "Diabetes Care 101" };
             var fakeDto = new ArticleDto { Id = 1, Title = "Diabetes Care 101" };
 
-            mockRepo.Setup(repo => repo.GetByIdAsync(expectedId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(fakeArticle);
-            mockMapper.Setup(m => m.Map<ArticleDto>(fakeArticle)).Returns(fakeDto);
-
-            // Create the service instance with the mocked dependencies
-            var service = new ArticleService(mockRepo.Object, mockUow.Object, mockMapper.Object);
+            _mockRepo.Setup(repo => repo.GetByIdAsync(expectedId, It.IsAny<CancellationToken>()))
+                 .ReturnsAsync(fakeArticle);
+            _mockMapper.Setup(m => m.Map<ArticleDto>(fakeArticle)).Returns(fakeDto);
 
 
-            // 2. Act: Execute the method
-            var result = await service.GetArticleByIdAsync(expectedId);
+            // 2. Act
+            var result = await _service.GetArticleByIdAsync(expectedId);
 
             // 3. Assert 
             Assert.IsNotNull(result); // Is Data Returned? (Not Null)

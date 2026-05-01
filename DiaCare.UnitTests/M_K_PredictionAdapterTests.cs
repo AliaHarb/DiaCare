@@ -4,7 +4,7 @@ using DiaCare.Domain.DTOS;
 using System.Text.Json;
 using System.Collections.Generic;
 
-namespace DiaCare.Tests
+namespace DiaCare.UnitTests
 {
     [TestClass]
     public class PredictionAdapterTests

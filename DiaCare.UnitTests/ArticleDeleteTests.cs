@@ -24,6 +24,9 @@ namespace DiaCare.UnitTests
 			mockUow = new Mock<IUnitOfWork>();
 			mockMapper = new Mock<IMapper>();
 			service = new ArticleService(mockRepo.Object, mockUow.Object, mockMapper.Object);
+
+
+
 		}
 
 		[TestMethod]
@@ -41,8 +44,8 @@ namespace DiaCare.UnitTests
 
 			// Assert
 			Assert.IsTrue(result);
-			mockRepo.Verify(r => r.DeleteAsync(fakeArticle, It.IsAny<CancellationToken>()), Times.Once);
-			mockUow.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+            mockRepo.Verify(r => r.Delete(fakeArticle), Times.Once);
+            mockUow.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
 		}
 
 		[TestMethod]
@@ -59,8 +62,8 @@ namespace DiaCare.UnitTests
 
 			// Assert
 			Assert.IsFalse(result);
-			mockRepo.Verify(r => r.DeleteAsync(It.IsAny<Article>(), It.IsAny<CancellationToken>()), Times.Never);
-			mockUow.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
+            mockRepo.Verify(r => r.Delete(It.IsAny<Article>()), Times.Never);
+            mockUow.Verify(u => u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Never);
 		}
 	}
 }
