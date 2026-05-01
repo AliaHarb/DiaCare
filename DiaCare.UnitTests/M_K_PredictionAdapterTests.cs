@@ -11,6 +11,8 @@ namespace DiaCare.Tests
     {
         private readonly PredictionAdapter _adapter = new PredictionAdapter();
 
+        // Test Case 1
+        
         /// <summary>
         /// Tests if specific fields in the DTO are correctly mapped to the AI request dictionary keys.
         /// Uses DataRow to avoid code duplication for similar mapping logic.
@@ -29,6 +31,8 @@ namespace DiaCare.Tests
             Assert.IsNotNull(result);
             Assert.AreEqual(value, double.Parse(result[key].ToString()));
         }
+
+        // Test Case 2
 
         /// <summary>
         /// Verifies that the adapter maps all 12 required medical fields for the AI model.
@@ -51,6 +55,8 @@ namespace DiaCare.Tests
             Assert.AreEqual(12, result.Count);
         }
 
+        // Test Case 3
+
         /// <summary>
         /// Validates that the AI JSON response (category and score) is correctly parsed into a DTO.
         /// Tested with multiple data rows to ensure consistency across different risk levels.
@@ -69,6 +75,8 @@ namespace DiaCare.Tests
             Assert.AreEqual(category, result.RiskCategory);
             Assert.AreEqual(score, result.RiskScore);
         }
+
+        // Test Case 4
 
         /// <summary>
         /// Ensures the mapping method returns the specific DTO type required by the application.
