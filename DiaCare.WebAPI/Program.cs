@@ -17,6 +17,18 @@ namespace DiaCare.WebAPI
             builder.Services.AddSwaggerGen();
             builder.Services.AddInfrastructure(builder.Configuration);
 
+
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll",
+                    builder =>
+                    {
+                        builder.AllowAnyOrigin()
+                               .AllowAnyMethod()
+                               .AllowAnyHeader();
+                    });
+            });
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -31,7 +43,7 @@ namespace DiaCare.WebAPI
                 c.RoutePrefix = string.Empty;
             });
 
-
+            app.UseCors("AllowAll");
             app.UseHttpsRedirection();
             app.UseAuthentication();
             app.UseAuthorization();
